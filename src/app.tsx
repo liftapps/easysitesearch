@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'preact/hooks';
+import { useCallback, useEffect, useReducer, useRef } from 'preact/hooks';
 
 type SearchResult = {
   title: string;
@@ -28,9 +28,25 @@ const runSearch = async (
   return json as Array<SearchResult>;
 };
 
+const sendMetrics = async (
+  config: { key: string; signal: AbortSignal },
+  query: string,
+  resultsCount: number,
+) => {
+  const metricsEndpoint = `http://127.0.0.1:3333/v1/metrics`;
+
+  const url = new URL(metricsEndpoint);
+  url.searchParams.append('key', config.key);
+  url.searchParams.append('query', query);
+  url.searchParams.append('results_count', `${resultsCount}`);
+
+  await fetch(url);
+};
+
 const SearchInput = (props: { onChange: (query: string) => void }) => {
   return (
     <input
+      ref={(self) => self?.focus()}
       type="search"
       placeholder="Search anything"
       onInput={(e) => props.onChange(e.currentTarget.value)}
@@ -38,7 +54,37 @@ const SearchInput = (props: { onChange: (query: string) => void }) => {
   );
 };
 
-const SearchResultsPreview = (props: { results: SearchResult[] }) => {
+const SearchResultsPreview = (props: {
+  results: SearchResult[];
+  phrase: string;
+}) => {
+  const timerRef = useRef(0);
+
+  useEffect(() => {
+    if (!props.phrase.length) {
+      return;
+    }
+
+    const abortController = new AbortController();
+
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      sendMetrics(
+        {
+          key: '01bf53f3-5fcf-4da1-ac48-54d89b9f405c',
+          signal: abortController.signal,
+        },
+        props.phrase,
+        props.results.length,
+      );
+    }, 1000);
+
+    return () => {
+      abortController.abort();
+      clearTimeout(timerRef.current);
+    };
+  }, [props.results, props.phrase]);
+
   return (
     <div>
       {props.results.map((result) => (
@@ -106,6 +152,13 @@ export function App() {
 
   const { phrase, results } = state;
   const timeoutRef = useRef(0);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  const handleCloseDialog = useCallback(() => {
+    dialogRef?.current?.close();
+    dispatch({ type: 'widgetClose' });
+    dispatch({ type: 'phraseChange', payload: '' });
+  }, []);
 
   useEffect(() => {
     if (!phrase.length) {
@@ -136,6 +189,10 @@ export function App() {
     };
   }, [phrase]);
 
+  useEffect(() => {
+    state.open ? dialogRef.current?.showModal() : handleCloseDialog();
+  }, [state.open]);
+
   return (
     <div>
       <button
@@ -149,17 +206,26 @@ export function App() {
         Search...
       </button>
 
-      {state.open && (
-        <div>
-          <SearchInput
-            onChange={(newPhrase) =>
-              dispatch({ type: 'phraseChange', payload: newPhrase })
-            }
-          />
+      <dialog
+        ref={dialogRef}
+        style={{ width: '100vw', height: '100vh' }}
+        onClose={handleCloseDialog}
+      >
+        {state.open && (
+          <>
+            <SearchInput
+              onChange={(newPhrase) =>
+                dispatch({ type: 'phraseChange', payload: newPhrase })
+              }
+            />
 
-          <SearchResultsPreview results={results}></SearchResultsPreview>
-        </div>
-      )}
+            <SearchResultsPreview
+              phrase={phrase}
+              results={results}
+            ></SearchResultsPreview>
+          </>
+        )}
+      </dialog>
     </div>
   );
 }
