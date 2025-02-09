@@ -159,7 +159,6 @@ export function App() {
     dialogRef?.current?.close();
     dispatch({ type: 'widgetClose' });
     dispatch({ type: 'phraseChange', payload: '' });
-    console.log('handleCloseDialog');
   }, []);
 
   useEffect(() => {
@@ -194,20 +193,18 @@ export function App() {
   useEffect(() => {
     state.open ? dialogRef.current?.showModal() : handleCloseDialog();
 
+    const handleClickOutside = (e: MouseEvent) => {
+      if (e?.target === dialogRef.current) {
+        handleCloseDialog();
+      }
+    };
+
     if (state.open) {
-      const inner = dialogRef.current?.querySelector('.inner');
-
-      const handleClick = (e: Event): void => {
-        if (!inner?.contains(e.target as any)) {
-          handleCloseDialog();
-        }
-      };
-      inner?.addEventListener('click', handleClick);
-
-      return inner?.removeEventListener('click', handleClick);
+      dialogRef.current?.addEventListener('click', handleClickOutside);
     }
 
-    return;
+    return () =>
+      dialogRef.current?.removeEventListener('click', handleClickOutside);
   }, [state.open]);
 
   return (
