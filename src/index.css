@@ -8,3 +8,46 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+input[type="search"] {
+  padding: 0.5rem;
+  display: block;
+  line-height: 2rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid whitesmoke;
+  font-size: 1.4rem;
+}
+
+.searchModal {
+  width: 80vw;
+  height: 80vh;
+  overflow-y: auto;
+
+  border-radius: 0.5rem;
+  border: 1px solid whitesmoke;
+
+  .inner {
+    height: 100%;
+  }
+}
+
+.result {
+  display: block;
+  padding: 0.5rem;
+
+  em {
+    font-weight: bold;
+    font-style: normal;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+}
+

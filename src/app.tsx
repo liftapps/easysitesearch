@@ -86,19 +86,20 @@ const SearchResultsPreview = (props: {
   }, [props.results, props.phrase]);
 
   return (
-    <div>
+    <div className="resultsWrapper">
       {props.results.map((result) => (
-        <div>
-          <a
-            style={{ display: 'block' }}
-            href={result.uri}
-            dangerouslySetInnerHTML={{ __html: result.title }}
-          ></a>
-          <div
-            id={result.uri}
-            dangerouslySetInnerHTML={{ __html: result.excerpt }}
-          ></div>
-        </div>
+        <a className="result" style={{ display: 'block' }} href={result.uri}>
+          <div>
+            <span
+              className="title"
+              dangerouslySetInnerHTML={{ __html: result.title }}
+            ></span>
+            <div
+              id={result.uri}
+              dangerouslySetInnerHTML={{ __html: result.excerpt }}
+            ></div>
+          </div>
+        </a>
       ))}
     </div>
   );
@@ -158,6 +159,7 @@ export function App() {
     dialogRef?.current?.close();
     dispatch({ type: 'widgetClose' });
     dispatch({ type: 'phraseChange', payload: '' });
+    console.log('handleCloseDialog');
   }, []);
 
   useEffect(() => {
@@ -191,6 +193,21 @@ export function App() {
 
   useEffect(() => {
     state.open ? dialogRef.current?.showModal() : handleCloseDialog();
+
+    if (state.open) {
+      const inner = dialogRef.current?.querySelector('.inner');
+
+      const handleClick = (e: Event): void => {
+        if (!inner?.contains(e.target as any)) {
+          handleCloseDialog();
+        }
+      };
+      inner?.addEventListener('click', handleClick);
+
+      return inner?.removeEventListener('click', handleClick);
+    }
+
+    return;
   }, [state.open]);
 
   return (
@@ -207,12 +224,14 @@ export function App() {
       </button>
 
       <dialog
+        className="searchModal"
         ref={dialogRef}
-        style={{ width: '100vw', height: '100vh' }}
         onClose={handleCloseDialog}
       >
         {state.open && (
-          <>
+          <div class="inner">
+            <button onClick={handleCloseDialog}>Close</button>
+
             <SearchInput
               onChange={(newPhrase) =>
                 dispatch({ type: 'phraseChange', payload: newPhrase })
@@ -223,7 +242,7 @@ export function App() {
               phrase={phrase}
               results={results}
             ></SearchResultsPreview>
-          </>
+          </div>
         )}
       </dialog>
     </div>
