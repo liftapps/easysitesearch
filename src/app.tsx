@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'preact/hooks';
 
+export interface Config {}
+
 type SearchResult = {
   title: string;
   excerpt: string;
@@ -148,12 +150,21 @@ const reducer = (currentState: State, action: Actions): State => {
   }
 };
 
-export function App() {
+export function App(props: { config: Config }) {
   const [state, dispatch] = useReducer<State, Actions>(reducer, initialState);
 
   const { phrase, results } = state;
   const timeoutRef = useRef(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const openEventListener = () => {
+      dispatch({ type: 'widgetOpen' });
+    };
+
+    document.addEventListener('openSearch', openEventListener);
+    return () => document.removeEventListener('openSearch', openEventListener);
+  }, []);
 
   const handleCloseDialog = useCallback(() => {
     dialogRef?.current?.close();
@@ -208,32 +219,36 @@ export function App() {
   }, [state.open]);
 
   return (
-    <div>
-      <button
-        style={{
-          border: '1px solid black',
-          background: 'none',
-          cursor: 'pointer',
-        }}
-        onClick={() => dispatch({ type: 'widgetOpen' })}
-      >
-        Search...
-      </button>
-
-      <dialog
-        className="searchModal"
-        ref={dialogRef}
-        onClose={handleCloseDialog}
-      >
+    <div class="searchWidget">
+      <dialog className="modal" ref={dialogRef} onClose={handleCloseDialog}>
         {state.open && (
           <div class="inner">
-            <button onClick={handleCloseDialog}>Close</button>
-
-            <SearchInput
-              onChange={(newPhrase) =>
-                dispatch({ type: 'phraseChange', payload: newPhrase })
-              }
-            />
+            <header>
+              <SearchInput
+                onChange={(newPhrase) =>
+                  dispatch({ type: 'phraseChange', payload: newPhrase })
+                }
+              />
+              <button className="closeButton" onClick={handleCloseDialog}>
+                <svg
+                  class="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18 17.94 6M18 18 6.06 6"
+                  />
+                </svg>
+              </button>
+            </header>
 
             <SearchResultsPreview
               phrase={phrase}
