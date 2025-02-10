@@ -1,5 +1,6 @@
 import { render } from 'preact';
-import { App, type Config } from './app.tsx';
+import { App } from './app.tsx';
+import { Config } from './types.ts';
 
 export const setup = (activatorSelector: string | string[], config: Config) => {
   const wrapperId = 'easy-site-search-wrapper';
