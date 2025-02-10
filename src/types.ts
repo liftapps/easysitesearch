@@ -1,1 +1,4 @@
-export interface Config {}
+export interface Config {
+  key: string;
+  apiUrl?: string;
+}

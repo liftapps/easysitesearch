@@ -5,6 +5,7 @@ import {
   useReducer,
   useRef,
 } from 'preact/hooks';
+import { Config } from './types';
 
 type SearchResult = {
   title: string;
@@ -13,20 +14,20 @@ type SearchResult = {
 };
 
 const runSearch = async (
-  config: { key: string; signal: AbortSignal },
+  options: { config: Config; signal: AbortSignal },
   query: string,
 ) => {
   if (!query.length) {
     return [];
   }
 
-  const url = new URL(`http://localhost:3333/v1/search`);
+  const url = new URL(`${options.config.apiUrl}/v1/search`);
 
-  url.searchParams.set('key', config.key);
+  url.searchParams.set('key', options.config.key);
   url.searchParams.set('query', query);
 
   const response = await fetch(url, {
-    signal: config.signal,
+    signal: options.signal,
   });
 
   const json = await response.json();
@@ -35,14 +36,14 @@ const runSearch = async (
 };
 
 const sendMetrics = async (
-  config: { key: string; signal: AbortSignal },
+  options: { config: Config; signal: AbortSignal },
   query: string,
   resultsCount: number,
 ) => {
-  const metricsEndpoint = `http://127.0.0.1:3333/v1/metrics`;
+  const metricsEndpoint = `${options.config.apiUrl}/v1/metrics`;
 
   const url = new URL(metricsEndpoint);
-  url.searchParams.append('key', config.key);
+  url.searchParams.append('key', options.config.key);
   url.searchParams.append('query', query);
   url.searchParams.append('results_count', `${resultsCount}`);
 
@@ -86,6 +87,7 @@ const EmptyPhraseCallout = () => {
 const SearchResultsPreview = (props: {
   results: SearchResult[];
   phrase: string;
+  config: Config;
 }) => {
   const timerRef = useRef(0);
 
@@ -100,7 +102,7 @@ const SearchResultsPreview = (props: {
     timerRef.current = setTimeout(() => {
       sendMetrics(
         {
-          key: '01bf53f3-5fcf-4da1-ac48-54d89b9f405c',
+          config: props.config,
           signal: abortController.signal,
         },
         props.phrase,
@@ -171,7 +173,10 @@ const reducer = (currentState: State, action: Actions): State => {
   }
 };
 
-export default function Modal(props: { onClose: VoidFunction }) {
+export default function Modal(props: {
+  onClose: VoidFunction;
+  config: Config;
+}) {
   const [state, dispatch] = useReducer<State, Actions>(reducer, initialState);
 
   const { phrase, results } = state;
@@ -197,7 +202,7 @@ export default function Modal(props: { onClose: VoidFunction }) {
       (async () => {
         const results = await runSearch(
           {
-            key: '01bf53f3-5fcf-4da1-ac48-54d89b9f405c',
+            config: props.config,
             signal: abortController.signal,
           },
           phrase,
@@ -259,6 +264,7 @@ export default function Modal(props: { onClose: VoidFunction }) {
         </header>
 
         <SearchResultsPreview
+          config={props.config}
           phrase={phrase}
           results={results}
         ></SearchResultsPreview>

@@ -20,7 +20,7 @@ export function App(props: { config: Config }) {
     <div class="searchWidget">
       {open && (
         <Suspense fallback={null}>
-          <LazyModal onClose={() => setIsOpen(false)} />
+          <LazyModal config={props.config} onClose={() => setIsOpen(false)} />
         </Suspense>
       )}
     </div>
