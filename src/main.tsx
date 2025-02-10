@@ -1,4 +1,4 @@
 import './index.css';
 import { setup } from './lib';
 
-setup('#activator', {});
+setup(['#activator', '#activator2'], {});
