@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
-import { lazy, Suspense } from 'preact/compat';
 import { Config } from './types';
-
-const LazyModal = lazy(() => import('./modal'));
+import Modal from './modal';
 
 export function App(props: { config: Config }) {
   const [open, setIsOpen] = useState(false);
@@ -18,11 +16,7 @@ export function App(props: { config: Config }) {
 
   return (
     <div class="searchWidget">
-      {open && (
-        <Suspense fallback={null}>
-          <LazyModal config={props.config} onClose={() => setIsOpen(false)} />
-        </Suspense>
-      )}
+      {open && <Modal config={props.config} onClose={() => setIsOpen(false)} />}
     </div>
   );
 }

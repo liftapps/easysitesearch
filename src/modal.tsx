@@ -89,7 +89,7 @@ const SearchResultsPreview = (props: {
   phrase: string;
   config: Config;
 }) => {
-  const timerRef = useRef(0);
+  const timerRef = useRef<any>(0);
 
   useEffect(() => {
     if (!props.phrase.length) {
@@ -180,7 +180,7 @@ export default function Modal(props: {
   const [state, dispatch] = useReducer<State, Actions>(reducer, initialState);
 
   const { phrase, results } = state;
-  const timeoutRef = useRef(0);
+  const timeoutRef = useRef<any>(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const handleCloseDialog = useCallback(() => {
