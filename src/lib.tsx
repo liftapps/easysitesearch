@@ -33,8 +33,8 @@ export const setup = (activatorSelector: string | string[], config: Config) => {
   });
 
   const configWithDefaults: Config = {
-    apiUrl: 'https://api.easysitesearch.com',
     ...config,
+    apiUrl: config.apiUrl ?? 'https://api.easysitesearch.com',
   };
 
   render(<App config={configWithDefaults} />, container);
