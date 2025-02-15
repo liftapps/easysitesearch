@@ -19,9 +19,7 @@
   }
 
   .modal {
-    position: fixed;
     margin-top: 1rem;
-
     width: 80vw;
     max-width: 32rem;
     border-radius: 0.5rem;
@@ -31,6 +29,7 @@
     header {
       display: flex;
       gap: 0.5rem;
+      height: 2rem;
     }
 
     footer {
@@ -40,7 +39,6 @@
     }
 
     .inner {
-      height: 100%;
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
@@ -60,6 +58,7 @@
           border: 1px solid whitesmoke;
           font-size: 1.4rem;
           flex-grow: 1;
+          outline: none;
         }
       }
 
