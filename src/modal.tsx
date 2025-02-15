@@ -80,10 +80,6 @@ const SearchInput = (props: { onChange: (query: string) => void }) => {
   );
 };
 
-const EmptyPhraseCallout = () => {
-  return <div class="emptyPhraseCallout">Type in your query to search</div>;
-};
-
 const SearchResultsPreview = (props: {
   results: SearchResult[];
   phrase: string;
@@ -135,7 +131,7 @@ const SearchResultsPreview = (props: {
 
   return (
     <div className="resultsWrapper">
-      {props.phrase.length ? resultsFragment : <EmptyPhraseCallout />}
+      {props.phrase.length ? resultsFragment : null}
     </div>
   );
 };
@@ -267,14 +263,7 @@ export default function Modal(props: {
           config={props.config}
           phrase={phrase}
           results={results}
-        ></SearchResultsPreview>
-
-        <footer>
-          Search by{' '}
-          <a target="_blank" href="https://easysitesearch.com">
-            easysitesearch.com
-          </a>
-        </footer>
+        />
       </div>
     </dialog>
   );
