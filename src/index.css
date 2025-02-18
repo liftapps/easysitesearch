@@ -5,6 +5,7 @@
 }
 
 .searchWidget {
+  font-size: 0.8rem;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -20,8 +21,8 @@
 
   .modal {
     margin-top: 1rem;
-    width: 80vw;
-    max-width: 32rem;
+    width: 86vw;
+    max-width: 48rem;
     border-radius: 0.5rem;
     border: 1px solid whitesmoke;
     padding: 1rem;
@@ -73,7 +74,7 @@
 
       .resultsWrapper {
         overflow-y: auto;
-        max-height: 50vh;
+        max-height: 80vh;
 
         .result {
           display: block;
@@ -85,7 +86,7 @@
           }
 
           .title {
-            font-size: 1.3rem;
+            font-size: 1rem;
             color: blue;
           }
         }
