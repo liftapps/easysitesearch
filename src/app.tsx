@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { Config } from './types';
 import Modal from './modal';
+import './index.css';
 
 export function App(props: { config: Config }) {
   const [open, setIsOpen] = useState(false);

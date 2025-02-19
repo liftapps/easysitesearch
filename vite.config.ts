@@ -11,6 +11,7 @@ export default defineConfig({
       name: 'EasySiteSearch', // The name your library will be exposed as globally
       formats: ['umd'], // Specify the output format as UMD
       fileName: (format) => `easy-site-search.${format}.js`, // Customize the output file name
+      cssFileName: `easy-site-search`,
     },
   },
 });
