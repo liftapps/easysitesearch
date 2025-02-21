@@ -7,10 +7,15 @@ import {
 } from 'preact/hooks';
 import { Config } from './types';
 
+const DEFAULT_CATEGORIES: Record<string, string> = {
+  '_default:page': 'Page',
+};
+
 type SearchResult = {
   title: string;
   excerpt: string;
   uri: string;
+  category: string;
 };
 
 const runSearch = async (
@@ -53,27 +58,10 @@ const sendMetrics = async (
 const SearchInput = (props: { onChange: (query: string) => void }) => {
   return (
     <div class="searchInput">
-      <svg
-        class="w-6 h-6 text-gray-800"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-width="2"
-          d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-        />
-      </svg>
-
       <input
         ref={(self) => self?.focus()}
         type="search"
-        placeholder="Search anything"
+        placeholder="Type in your query"
         onInput={(e) => props.onChange(e.currentTarget.value)}
       />
     </div>
@@ -116,10 +104,15 @@ const SearchResultsPreview = (props: {
     return props.results.map((result) => (
       <a className="result" style={{ display: 'block' }} href={result.uri}>
         <div>
-          <span
-            className="title"
-            dangerouslySetInnerHTML={{ __html: result.title }}
-          ></span>
+          <div class="titleWrapper">
+            <span class="category">
+              {DEFAULT_CATEGORIES[result.category ?? ''] ?? result.category}
+            </span>
+            <span
+              className="title"
+              dangerouslySetInnerHTML={{ __html: result.title }}
+            ></span>
+          </div>
           <div
             id={result.uri}
             dangerouslySetInnerHTML={{ __html: result.excerpt }}
@@ -233,18 +226,13 @@ export default function Modal(props: {
     <dialog className="modal" ref={dialogRef} onClose={handleCloseDialog}>
       <div class="inner">
         <header>
-          <SearchInput
-            onChange={(newPhrase) =>
-              dispatch({ type: 'phraseChange', payload: newPhrase })
-            }
-          />
+          <span class="header-text">Search</span>
           <button className="closeButton" onClick={handleCloseDialog}>
             <svg
-              class="w-6 h-6 text-gray-800"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="48"
+              height="48"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -258,6 +246,14 @@ export default function Modal(props: {
             </svg>
           </button>
         </header>
+
+        <search>
+          <SearchInput
+            onChange={(newPhrase) =>
+              dispatch({ type: 'phraseChange', payload: newPhrase })
+            }
+          />
+        </search>
 
         <SearchResultsPreview
           config={props.config}
