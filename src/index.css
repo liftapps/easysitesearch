@@ -23,6 +23,8 @@
     width: 100vw;
     height: 100vh;
     border: none;
+    max-width: none;
+    max-height: none;
 
     header {
       display: flex;
@@ -76,7 +78,7 @@
         background: none;
         cursor: pointer;
         position: relative;
-        right: -1rem;
+        right: 0.5rem;
       }
 
       .resultsWrapper {
