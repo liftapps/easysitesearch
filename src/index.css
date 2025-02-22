@@ -75,8 +75,8 @@
         border: 1px solid transparent;
         background: none;
         cursor: pointer;
-        padding: 0 2rem;
         position: relative;
+        right: -1rem;
       }
 
       .resultsWrapper {
