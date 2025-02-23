@@ -1,59 +1,7 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-} from 'preact/hooks';
-import { Config } from './types';
-
-const DEFAULT_CATEGORIES: Record<string, string> = {
-  '_default:page': 'Page',
-};
-
-type SearchResult = {
-  title: string;
-  excerpt: string;
-  uri: string;
-  category: string;
-};
-
-const runSearch = async (
-  options: { config: Config; signal: AbortSignal },
-  query: string,
-) => {
-  if (!query.length) {
-    return [];
-  }
-
-  const url = new URL(`${options.config.apiUrl}/v1/search`);
-
-  url.searchParams.set('key', options.config.key);
-  url.searchParams.set('query', query);
-
-  const response = await fetch(url, {
-    signal: options.signal,
-  });
-
-  const json = await response.json();
-
-  return json as Array<SearchResult>;
-};
-
-const sendMetrics = async (
-  options: { config: Config; signal: AbortSignal },
-  query: string,
-  resultsCount: number,
-) => {
-  const metricsEndpoint = `${options.config.apiUrl}/v1/metrics`;
-
-  const url = new URL(metricsEndpoint);
-  url.searchParams.append('key', options.config.key);
-  url.searchParams.append('query', query);
-  url.searchParams.append('results_count', `${resultsCount}`);
-
-  await fetch(url);
-};
+import { useCallback, useEffect, useReducer, useRef } from 'preact/hooks';
+import { Config, SearchResult } from './types';
+import { runSearch } from './api';
+import { SearchResultsPreview } from './components/SearchResultsPreview';
 
 const SearchInput = (props: { onChange: (query: string) => void }) => {
   return (
@@ -64,67 +12,6 @@ const SearchInput = (props: { onChange: (query: string) => void }) => {
         placeholder="Type in your query"
         onInput={(e) => props.onChange(e.currentTarget.value)}
       />
-    </div>
-  );
-};
-
-const SearchResultsPreview = (props: {
-  results: SearchResult[];
-  phrase: string;
-  config: Config;
-}) => {
-  const timerRef = useRef<any>(0);
-
-  useEffect(() => {
-    if (!props.phrase.length) {
-      return;
-    }
-
-    const abortController = new AbortController();
-
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      sendMetrics(
-        {
-          config: props.config,
-          signal: abortController.signal,
-        },
-        props.phrase,
-        props.results.length,
-      );
-    }, 1000);
-
-    return () => {
-      abortController.abort();
-      clearTimeout(timerRef.current);
-    };
-  }, [props.results, props.phrase]);
-
-  const resultsFragment = useMemo(() => {
-    return props.results.map((result) => (
-      <a className="result" style={{ display: 'block' }} href={result.uri}>
-        <div>
-          <div class="titleWrapper">
-            <span class="category">
-              {DEFAULT_CATEGORIES[result.category ?? ''] ?? result.category}
-            </span>
-            <span
-              className="title"
-              dangerouslySetInnerHTML={{ __html: result.title }}
-            ></span>
-          </div>
-          <div
-            id={result.uri}
-            dangerouslySetInnerHTML={{ __html: result.excerpt }}
-          ></div>
-        </div>
-      </a>
-    ));
-  }, [props.results]);
-
-  return (
-    <div className="resultsWrapper">
-      {props.phrase.length ? resultsFragment : null}
     </div>
   );
 };
