@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'preact/hooks';
+import { useEffect, useReducer } from 'preact/hooks';
 import { getRecommendations } from '../api';
 import { Config, SearchResult } from '../types';
 import { SearchResultRenderer } from './SearchResultRenderer';
