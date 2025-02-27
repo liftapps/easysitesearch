@@ -20,26 +20,17 @@
   }
 
   .modal {
-    width: 100vw;
-    height: 100vh;
+    width: 90vw;
+    max-width: 48rem;
     border: none;
-    max-width: none;
     max-height: none;
+    border-radius: 1rem;
+    margin-top: 1rem;
 
     header {
       display: flex;
       gap: 0.5rem;
       justify-content: space-between;
-
-      .header-text {
-        display: block;
-        font-size: 2rem;
-        font-weight: bold;
-      }
-    }
-
-    search {
-      margin-top: 1rem;
     }
 
     footer {
@@ -53,7 +44,6 @@
       flex-direction: column;
       gap: 0.25rem;
       padding: 0.5rem 1rem;
-      min-height: 80vh;
 
       .searchInput {
         display: flex;
@@ -78,7 +68,12 @@
         background: none;
         cursor: pointer;
         position: relative;
-        right: 0.5rem;
+        right: -0.5rem;
+        color: #ccc;
+
+        &:hover {
+          color: #aaa;
+        }
       }
 
     }
@@ -87,10 +82,12 @@
       overflow-y: auto;
       margin-top: 0.5rem;
       flex-grow: 1;
+      max-height: 50vh;
 
       .result {
         display: block;
         padding: 0.5rem;
+        margin-bottom: 1rem;
 
         &:hover {
           background: whitesmoke;
@@ -131,20 +128,21 @@
       }
     }
   }
+
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type="search"]::-ms-clear {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  input[type="search"]::-ms-reveal {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }
 
-input[type="search"]::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-input[type="search"]::-ms-clear {
-  display: none;
-  width: 0;
-  height: 0;
-}
-input[type="search"]::-ms-reveal {
-  display: none;
-  width: 0;
-  height: 0;
-}

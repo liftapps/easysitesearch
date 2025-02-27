@@ -9,7 +9,7 @@ const SearchInput = (props: { onChange: (query: string) => void }) => {
       <input
         ref={(self) => self?.focus()}
         type="search"
-        placeholder="Type in your query"
+        placeholder="Search"
         onInput={(e) => props.onChange(e.currentTarget.value)}
       />
     </div>
@@ -113,7 +113,12 @@ export default function Modal(props: {
     <dialog className="modal" ref={dialogRef} onClose={handleCloseDialog}>
       <div class="inner">
         <header>
-          <span class="header-text">Search</span>
+          <SearchInput
+            onChange={(newPhrase) =>
+              dispatch({ type: 'phraseChange', payload: newPhrase })
+            }
+          />
+
           <button className="closeButton" onClick={handleCloseDialog}>
             <svg
               aria-hidden="true"
@@ -133,14 +138,6 @@ export default function Modal(props: {
             </svg>
           </button>
         </header>
-
-        <search>
-          <SearchInput
-            onChange={(newPhrase) =>
-              dispatch({ type: 'phraseChange', payload: newPhrase })
-            }
-          />
-        </search>
 
         <SearchResultsPreview
           config={props.config}
