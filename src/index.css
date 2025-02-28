@@ -102,21 +102,32 @@
           .title {
             font-size: 1rem;
             color: blue;
-            margin-left: 0.250rem;
           }
+        }
 
-          .category {
-            display: inline-block;
-            position: relative;
-            top: -0.125rem;
-            background: #0099ff;
-            color: white;
-            font-weight: bolder;
-            text-transform: uppercase;
-            font-size: 0.5rem;
-            padding: 0.125rem;
-            border-radius: 0.125rem;
-          }
+        .uri {
+          font-size: 0.8rem;
+          color: gray;
+        }
+
+        .excerpt {
+          margin-top: 1rem;
+        }
+
+        .category {
+          display: inline-block;
+          position: relative;
+          background: #0099ff;
+          color: white;
+          font-weight: bolder;
+          text-transform: uppercase;
+          font-size: 0.5rem;
+          padding: 0.125rem;
+          border-radius: 0.125rem;
+        }
+
+        .tags {
+          margin-top: 0.5rem;
         }
       }
 
