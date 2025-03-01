@@ -8,4 +8,5 @@ export type SearchResult = {
   excerpt: string;
   uri: string;
   category: string;
+  thumbnail?: string;
 };
