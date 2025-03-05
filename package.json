@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "minisearch": "^7.1.2",
     "preact": "^10.25.3"
   },
   "devDependencies": {

@@ -1,6 +1,35 @@
 import { Config, SearchResult } from './types';
+import Minisearch from 'minisearch';
 
-export const runSearch = async (
+export const fetchClientIndexIfEnabled = async (config: Config) => {
+  const configUrl = new URL(`${config.apiUrl}/v1/config`);
+  configUrl.searchParams.set('key', config.key);
+
+  const configResponse = await fetch(configUrl);
+
+  if (configResponse.status !== 200) {
+    return null;
+  }
+
+  if ((await configResponse.json()).mode !== 'client') {
+    return null;
+  }
+
+  const jsonIndexResponse = await fetch(
+    `https://indices.easysitesearch.com/${config.key}.json?v=${Date.now()}`,
+  );
+
+  if (jsonIndexResponse.status !== 200) {
+    return null;
+  }
+
+  return Minisearch.loadJSONAsync(await jsonIndexResponse.text(), {
+    fields: ['title', 'text', 'category', 'tags'],
+    storeFields: ['title', 'text', 'category', 'uri', 'thumbnail'],
+  });
+};
+
+export const runServerSearch = async (
   options: { config: Config; signal: AbortSignal },
   query: string,
 ) => {

@@ -1,7 +1,48 @@
 import { useCallback, useEffect, useReducer, useRef } from 'preact/hooks';
 import { Config, SearchResult } from './types';
-import { runSearch } from './api';
+import { fetchClientIndexIfEnabled, runServerSearch } from './api';
 import { SearchResultsPreview } from './components/SearchResultsPreview';
+
+const highlightTerms = (
+  text: string,
+  items: string[],
+  caseSensitive = false,
+) => {
+  // Make a copy of the original text
+  let result = text;
+
+  // Sort items by length (longest first) to handle overlapping terms correctly
+  const sortedItems = [...items].sort((a, b) => b.length - a.length);
+
+  // Escape special regex characters in the items
+  const escapedItems = sortedItems.map((item) =>
+    item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+  );
+
+  // Create a regex that matches any of the items
+  const flags = caseSensitive ? 'g' : 'gi';
+  const regex = new RegExp(`\\b(${escapedItems.join('|')})\\b`, flags);
+
+  // Replace all occurrences with the same text wrapped in <em> tags
+  return result.replace(regex, '<em>$1</em>');
+};
+
+const anyToSearchResult = (doc: any): SearchResult => {
+  const words = doc.text.split(' ');
+  const firstMatch = words.indexOf(doc.terms[0]);
+  const baseExcerpt = doc.text.split(' ').slice(firstMatch, 80).join(' ');
+  const excerpt = baseExcerpt.length
+    ? highlightTerms(baseExcerpt, doc.terms)
+    : doc.text.split(' ').slice(0, 80).join(' ');
+
+  return {
+    category: doc.category,
+    title: highlightTerms(doc.title, doc.terms),
+    uri: doc.uri,
+    thumbnail: doc.thumbnail,
+    excerpt: `${excerpt}...`,
+  };
+};
 
 const SearchInput = (props: { onChange: (query: string) => void }) => {
   return (
@@ -16,18 +57,31 @@ const SearchInput = (props: { onChange: (query: string) => void }) => {
   );
 };
 
+type LocalIndex = Awaited<ReturnType<typeof fetchClientIndexIfEnabled>>;
+
 type State = {
   phrase: string;
   results: SearchResult[];
+  localIndex: LocalIndex;
+  status: 'error' | 'ready' | 'initializing';
 };
 
 type Actions =
+  | {
+      type: 'init';
+      payload: Awaited<ReturnType<typeof fetchClientIndexIfEnabled>>;
+    }
   | { type: 'phraseChange'; payload: string }
   | { type: 'widgetOpen' }
   | { type: 'widgetClose' }
   | { type: 'resultsSet'; payload: SearchResult[] };
 
-const initialState: State = { phrase: '', results: [] };
+const initialState: State = {
+  phrase: '',
+  results: [],
+  localIndex: null,
+  status: 'initializing',
+};
 
 const reducer = (currentState: State, action: Actions): State => {
   switch (action.type) {
@@ -35,6 +89,13 @@ const reducer = (currentState: State, action: Actions): State => {
       return {
         ...currentState,
         phrase: action.payload,
+      };
+    }
+    case 'init': {
+      return {
+        ...currentState,
+        status: 'ready',
+        localIndex: action.payload,
       };
     }
     case 'resultsSet': {
@@ -55,7 +116,7 @@ export default function Modal(props: {
 }) {
   const [state, dispatch] = useReducer<State, Actions>(reducer, initialState);
 
-  const { phrase, results } = state;
+  const { phrase, results, localIndex, status } = state;
   const timeoutRef = useRef<any>(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -66,7 +127,14 @@ export default function Modal(props: {
   }, [props.onClose]);
 
   useEffect(() => {
-    if (!phrase.length) {
+    (async () => {
+      const index = await fetchClientIndexIfEnabled(props.config);
+      dispatch({ type: 'init', payload: index });
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!phrase.length || status === 'initializing') {
       dispatch({ type: 'resultsSet', payload: [] });
       return;
     }
@@ -76,7 +144,20 @@ export default function Modal(props: {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       (async () => {
-        const results = await runSearch(
+        // Run client search if server enabled it due to license check
+        if (localIndex) {
+          const localSearchResults = localIndex.search(phrase, {
+            prefix: (term) => term.length > 3,
+            fuzzy: (term) => (term.length > 3 ? 0.2 : false),
+          });
+
+          return dispatch({
+            type: 'resultsSet',
+            payload: localSearchResults.map(anyToSearchResult),
+          });
+        }
+
+        const results = await runServerSearch(
           {
             config: props.config,
             signal: abortController.signal,
