@@ -43,7 +43,6 @@
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      padding: 0.5rem 1rem;
 
       .searchInput {
         display: flex;
@@ -52,14 +51,15 @@
         gap: 1rem;
 
         input[type="search"] {
-          padding: 0.5rem 1rem;
+          padding: 0.5rem 0.5rem;
           display: block;
           line-height: 2rem;
           border-radius: 0.5rem;
           border: 1px solid #dedede;
-          font-size: 1.4rem;
+          font-size: 1.25rem;
           flex-grow: 1;
           outline: none;
+          width: 100%;
         }
       }
 
@@ -79,22 +79,21 @@
     }
 
     .resultsPreview {
-      overflow-y: auto;
       margin-top: 0.5rem;
+      overflow-y: auto;
       flex-grow: 1;
       max-height: 80vh;
 
       .result {
         display: grid;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
         grid: 
           'title' 
           'thumbnail' 
           'body' 
           'footer';
         row-gap: 0.5rem;
-
+        padding: 0.5rem;
+        border-radius: 0.5rem;
 
         @media screen and (min-width: 768px) {
           column-gap: 0.5rem;
@@ -169,8 +168,10 @@
 
       .recommendations {
         .header-text {
-          font-size: 1.5rem;
+          margin: 0;
+          font-size: 1.2rem;
           font-weight: bold;
+          color: #bbb;
         }
       }
     }
