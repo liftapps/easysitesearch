@@ -8,9 +8,7 @@ export function App(props: { config: Config }) {
 
   useEffect(() => {
     const openEventListener = (event: any) => {
-      console.log(event);
       if (event.detail.config.key !== props.config.key) {
-        setIsOpen(false);
         return;
       }
 
