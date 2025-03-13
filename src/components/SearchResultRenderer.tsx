@@ -8,6 +8,7 @@ export const SearchResultRenderer = (props: {
   return (
     <a
       className="result"
+      target={props.config.resultBaseUrl?.length ? '_blank' : '_self'}
       href={`${props.config.resultBaseUrl ?? ''}${props.result.uri}`}
     >
       <div className="titleWrapper">
