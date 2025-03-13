@@ -38,7 +38,11 @@ export const SearchResultsPreview = (props: {
 
   const resultsFragment = useMemo(() => {
     return props.results.map((result) => (
-      <SearchResultRenderer key={result.uri} result={result} />
+      <SearchResultRenderer
+        config={props.config}
+        key={result.uri}
+        result={result}
+      />
     ));
   }, [props.results]);
 

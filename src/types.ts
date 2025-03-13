@@ -1,6 +1,7 @@
 export interface Config {
   key: string;
   apiUrl?: string;
+  resultBaseUrl?: string;
 }
 
 export type SearchResult = {

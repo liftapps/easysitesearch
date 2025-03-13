@@ -1,9 +1,15 @@
 import { DEFAULT_CATEGORIES } from '../constants';
-import { SearchResult } from '../types';
+import { Config, SearchResult } from '../types';
 
-export const SearchResultRenderer = (props: { result: SearchResult }) => {
+export const SearchResultRenderer = (props: {
+  result: SearchResult;
+  config: Config;
+}) => {
   return (
-    <a className="result" href={props.result.uri}>
+    <a
+      className="result"
+      href={`${props.config.resultBaseUrl ?? ''}${props.result.uri}`}
+    >
       <div className="titleWrapper">
         <span
           className="title"

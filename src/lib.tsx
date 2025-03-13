@@ -6,6 +6,7 @@ export const setup = (activatorSelector: string | string[], config: Config) => {
   const configWithDefaults: Config = {
     ...config,
     apiUrl: config.apiUrl ?? 'https://api.easysitesearch.com',
+    resultBaseUrl: config.resultBaseUrl ?? '',
   };
 
   const wrapperId = 'easy-site-search-wrapper';
