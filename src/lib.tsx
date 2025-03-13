@@ -32,7 +32,12 @@ export const setup = (activatorSelector: string | string[], config: Config) => {
       element?.addEventListener('click', (e) => {
         e.preventDefault();
 
-        const openEvent = new Event('openSearch');
+        const openEvent = new CustomEvent('openSearch', {
+          detail: {
+            config,
+          },
+        });
+
         document.dispatchEvent(openEvent);
       });
     });
