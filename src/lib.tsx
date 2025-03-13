@@ -9,7 +9,7 @@ export const setup = (activatorSelector: string | string[], config: Config) => {
     resultBaseUrl: config.resultBaseUrl ?? '',
   };
 
-  const wrapperId = 'easy-site-search-wrapper';
+  const wrapperId = `easy-site-search-wrapper_${config.key}`;
 
   const existingContainer = document.querySelector(`#${wrapperId}`);
   if (existingContainer) {
