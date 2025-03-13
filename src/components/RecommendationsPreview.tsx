@@ -65,7 +65,11 @@ export const Recommendations = (props: { config: Config }) => {
     <div className="recommendations">
       <h4 className="header-text">Recommended</h4>
       {state.results.map((result) => (
-        <SearchResultRenderer key={result.uri} result={result} />
+        <SearchResultRenderer
+          config={props.config}
+          key={result.uri}
+          result={result}
+        />
       ))}
     </div>
   );
