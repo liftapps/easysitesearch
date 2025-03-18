@@ -44,13 +44,16 @@ const anyToSearchResult = (doc: any): SearchResult => {
   };
 };
 
-const SearchInput = (props: { onChange: (query: string) => void }) => {
+const SearchInput = (props: {
+  config: Config;
+  onChange: (query: string) => void;
+}) => {
   return (
     <div class="searchInput">
       <input
         ref={(self) => self?.focus()}
         type="search"
-        placeholder="Search"
+        placeholder={props.config.searchInput?.placeholder ?? 'Search'}
         onInput={(e) => props.onChange(e.currentTarget.value)}
       />
     </div>
@@ -195,6 +198,7 @@ export default function Modal(props: {
       <div class="inner">
         <header>
           <SearchInput
+            config={props.config}
             onChange={(newPhrase) =>
               dispatch({ type: 'phraseChange', payload: newPhrase })
             }
